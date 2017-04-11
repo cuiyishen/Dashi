@@ -107,10 +107,28 @@ function onPositionUpdated(position) {
 }
 
 function onLoadPositionFailed() {
-  console.warn('navigator.geolocation is not available');
-  loadNearbyRestaurants();
-}
+	  console.warn('navigator.geolocation is not available');
+	  getLocationFromIP();
+	}
 
+	function getLocationFromIP() {
+	  // Get location from http://ipinfo.io/json
+	  var url = 'http://ipinfo.io/json'
+	  var req = null;
+	  ajax('GET', url, req,
+	    function (res) {
+	      var result = JSON.parse(res);
+	      if ('loc' in result) {
+	        var loc = result.loc.split(',');
+	        lat = loc[0];
+	        lng = loc[1];
+	      } else {
+	        console.warn('Getting location by IP failed.');
+	      }
+	      loadNearbyRestaurants();
+	    }
+	  );
+	}
 //-----------------------------------
 //  Login
 //-----------------------------------

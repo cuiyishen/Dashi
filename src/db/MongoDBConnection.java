@@ -1,7 +1,9 @@
 package db;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -248,7 +250,5 @@ public class MongoDBConnection implements DBConnection {
             System.out.println(e.getMessage());
         }
         return null;
-    }
-
-
+    }	
 }
