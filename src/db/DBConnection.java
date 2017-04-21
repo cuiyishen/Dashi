@@ -94,5 +94,7 @@ public interface DBConnection {
      * @return First and Last Name
      */
     public String getFirstLastName(String userId);
+    
+    public void setUser(String userId, String password, String firstName, String lastName);
 
 }

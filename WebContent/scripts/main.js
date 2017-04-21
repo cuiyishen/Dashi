@@ -13,17 +13,16 @@ var lat           = 37.38;
  */
 function init() {
   // Register event listeners
-  $('login-btn').addEventListener('click', login);
+  $('login-btn').addEventListener('click', login); 
+  $('register-btn').addEventListener('click', register); 
+  $('register-link').addEventListener('click', showRegister);
+  $('login-link').addEventListener('click', showLogin);
   $('nearby-btn').addEventListener('click', loadNearbyRestaurants);
   $('fav-btn').addEventListener('click', loadFavoriteRestaurants);
   $('recommend-btn').addEventListener('click', loadRecommendedRestaurants);
   
-  // validateSession();
-  
-//  onSessionValid({
-//	  user_id: '1111',
-//	  name: 'John Smith'
-//  });
+  validateSession();
+  //onSessionValid({user_id : '1111', name: 'John Smith'});
 }
 
 /**
@@ -60,6 +59,7 @@ function onSessionValid(result) {
   var avatar = $('avatar');
   var welcomeMsg = $('welcome-msg');
   var logoutBtn = $('logout-link');
+  var registerForm = $('register-form');
   
   welcomeMsg.innerHTML = 'Welcome, ' + user_fullname;
 
@@ -69,6 +69,7 @@ function onSessionValid(result) {
   showElement(welcomeMsg);
   showElement(logoutBtn, 'inline-block');
   hideElement(loginForm);
+  hideElement(registerForm);
 
   initGeoLocation();
 }
@@ -80,20 +81,21 @@ function onSessionInvalid() {
   var avatar = $('avatar');
   var welcomeMsg = $('welcome-msg');
   var logoutBtn = $('logout-link');
+  var registerForm = $('register-form');
 
   hideElement(restaurantNav);
   hideElement(restaurantList);
   hideElement(avatar);
   hideElement(logoutBtn);
   hideElement(welcomeMsg);
-  
+  hideElement(registerForm);
   showElement(loginForm);
 }
 
 function initGeoLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(onPositionUpdated, onLoadPositionFailed, {maximumAge: 60000});
-    showLoadingMessage('Retrieving your location...');
+	showLoadingMessage('Retrieving your location...');
   } else {
     onLoadPositionFailed();
   }
@@ -107,33 +109,43 @@ function onPositionUpdated(position) {
 }
 
 function onLoadPositionFailed() {
-	  console.warn('navigator.geolocation is not available');
-	  getLocationFromIP();
-	}
+  console.warn('navigator.geolocation is not available');
+  //loadNearbyRestaurants();
+  getLocationFromIP();
+}
 
-	function getLocationFromIP() {
-	  // Get location from http://ipinfo.io/json
-	  var url = 'http://ipinfo.io/json'
-	  var req = null;
-	  ajax('GET', url, req,
-	    function (res) {
-	      var result = JSON.parse(res);
-	      if ('loc' in result) {
-	        var loc = result.loc.split(',');
-	        lat = loc[0];
-	        lng = loc[1];
-	      } else {
-	        console.warn('Getting location by IP failed.');
-	      }
-	      loadNearbyRestaurants();
-	    }
-	  );
-	}
+function getLocationFromIP() {
+  // Get location from http://ipinfo.io/json
+  var url = 'http://ipinfo.io/json'
+  var req = null;
+  ajax('GET', url, req,
+    // session is still valid
+    function (res) {
+      var result = JSON.parse(res);
+      if ('loc' in result) {
+        var loc = result.loc.split(',');
+        lat = loc[0];
+        lng = loc[1];
+      } else {
+        console.warn('Getting location by IP failed.');
+      }
+      loadNearbyRestaurants();
+    }
+  );
+}
+
 //-----------------------------------
 //  Login
 //-----------------------------------
-
+function showLogin(){
+  clearRegisterError();
+  var registerForm = $('register-form');
+  hideElement(registerForm);
+  var loginForm = $('login-form');
+  showElement(loginForm);
+}
 function login() {
+  clearLoginError();
   var username = $('username').value;
   var password = $('password').value;
   password = md5(username + md5(password));
@@ -168,6 +180,70 @@ function clearLoginError() {
 	$('login-error').innerHTML = '';
 }
 
+  
+//-----------------------------------
+//  Register
+//-----------------------------------
+function showRegister() {
+	clearLoginError();
+  var loginForm = $('login-form');
+  hideElement(loginForm);
+  var registerForm = $('register-form');
+  showElement(registerForm);
+}
+function register() {
+	clearRegisterError();
+  var username = $('usernamer').value;
+  var passwordr = $('passwordr').value;
+  var passwordConfirm = $('passwordc').value;
+  if(username===''|| passwordr==='' || passwordr!==passwordConfirm){
+    showRegisterError();
+  }else{
+    var fn = $('firstName').value;
+    var ln = $('lastName').value;
+    passwordr = md5(username + md5(passwordr));
+    //The request parameters
+    var checkUser = 'user_id=' + username;
+    var params = 'user_id=' + username + '&password=' + passwordr+ '&fn=' + fn + '&ln=' + ln;
+    var url = './RegisterServlet';
+    var req = JSON.stringify({});
+    ajax('GET', url+'?'+checkUser, req,
+      // successful callback
+      function (res) {
+        var result = JSON.parse(res);    
+        // username available
+        if (result.status === 'OK') {
+        	regiUser(url+'?'+params);
+        }
+      },
+      // error
+      function () {
+        showRegisterError();
+      }
+    );
+  }
+}
+function regiUser(url){
+  var req = JSON.stringify({});
+  ajax('POST', url , req,
+    // successful callback
+    function (res) {
+      var result = JSON.parse(res);
+      // successfully register
+      if (result.status === 'OK') {
+        showLogin();
+      }
+    }
+  )
+}
+       
+function showRegisterError() {
+    $('register-error').innerHTML = 'Username in use or Password not valid!';
+}
+
+function clearRegisterError() {
+	$('register-error').innerHTML = '';
+}
 // -----------------------------------
 //  Helper Functions
 // -----------------------------------
@@ -321,7 +397,8 @@ function loadNearbyRestaurants() {
  * Load favorite (or visited) restaurants
  * API end point: [GET] /Dashi/history?user_id=1111
  */
-function loadFavoriteRestaurants() {
+function loadFavoriteRestaurants(event) {
+  event.preventDefault();
   activeBtn('fav-btn');
 
   // The request parameters

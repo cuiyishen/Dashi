@@ -251,4 +251,7 @@ public class MongoDBConnection implements DBConnection {
         }
         return null;
     }	
+    public void setUser(String userId, String password, String firstName, String lastName){
+    //todo
+    }
 }

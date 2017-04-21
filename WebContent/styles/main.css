@@ -110,6 +110,7 @@ ul {
 /**
  * login form
  */
+
 #login-form {
   color: #624630;
   margin: 0px auto;
@@ -137,7 +138,58 @@ ul {
   text-align: right;
 }
 
+#login-form a {
+  cursor: pointer;
+  float: right;
+  padding: 2px 0px;
+  text-align: right;
+}
+
 #login-error {
+  clear: both;
+  color: #990000;
+  padding-top: 10px;
+}
+
+/**
+ * register form
+ */
+#register-form {
+  color: #624630;
+  margin: 0px auto;
+  overflow: auto;
+  padding: 40px;
+  width: 300px;
+  display: none;
+}
+
+#register-form label {
+  display: block;
+}
+
+#register-form input {
+  border: none;
+  display: block;
+  margin-bottom: 6px;
+  padding: 5px;
+  width: 100%;
+}
+
+#register-form button {
+  cursor: pointer;
+  float: right;
+  padding: 8px 20px;
+  text-align: right;
+}
+
+#register-form a {
+  cursor: pointer;
+  float: right;
+  padding: 2px 0px;
+  text-align: right;
+}
+
+#register-error {
   clear: both;
   color: #990000;
   padding-top: 10px;
@@ -307,3 +359,4 @@ footer ul {
 footer ul li {
   flex: 1;
 }
+

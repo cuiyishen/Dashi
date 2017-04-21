@@ -321,6 +321,20 @@ public class MySQLDBConnection implements DBConnection {
         return name;
 
 	}
+	@Override
+	public void setUser(String userId, String password, String firstName, String lastName){
+        String query = "INSERT INTO users (user_id, password, first_name, last_name) VALUES (?, ?,?,?)";
+        try {
+            PreparedStatement statement = conn.prepareStatement(query);
+            statement.setString(1,  userId);
+            statement.setString(2, password);
+            statement.setString(3, firstName);
+            statement.setString(4, lastName);
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
 	
 
 }
