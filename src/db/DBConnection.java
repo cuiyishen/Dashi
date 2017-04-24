@@ -6,6 +6,8 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import model.Comment;
+
 public interface DBConnection {
 
     /**
@@ -96,5 +98,9 @@ public interface DBConnection {
     public String getFirstLastName(String userId);
     
     public void setUser(String userId, String password, String firstName, String lastName);
+    
+    public JSONArray getComments(String businessId);
+    
+    public void setComments(String userId, String businessId, String userFullName, String comment);
 
 }

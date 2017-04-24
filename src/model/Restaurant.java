@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -19,23 +20,26 @@ public class Restaurant {
     private double longitude;
     private String imageUrl;
     private String url;
+    private Integer review_count;
     
     public Restaurant(JSONObject object) {
         try {
             if (object != null) {
                 this.businessId = object.getString("id");
                 JSONArray jsonArray = (JSONArray) object.get("categories");
-                List<String> list = new ArrayList<>();
+                HashSet<String> list = new HashSet<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONArray subArray = jsonArray.getJSONArray(i);
                     for (int j = 0; j < subArray.length(); j++) {
-                        list.add(parseString(subArray.getString(j)));
+                    	String cat = parseString(subArray.getString(j)).toLowerCase();
+                        list.add(cat);
                     }
                 }
                 this.categories = String.join(",", list);
                 this.name = object.getString("name");
                 this.imageUrl = object.getString("image_url");
                 this.stars = object.getDouble("rating");
+                this.review_count = object.getInt("review_count");
                 JSONObject location = (JSONObject) object.get("location");
                 JSONObject coordinate = (JSONObject) location.get("coordinate");
                 this.latitude = coordinate.getDouble("latitude");
@@ -52,7 +56,7 @@ public class Restaurant {
     }
     
     public Restaurant(String businessId, String name, String categories,
-            String city, String state, double stars, String fullAddress,
+            String city, String state, double stars, Integer review_count, String fullAddress,
             double latitude, double longitude, String imageUrl, String url) {
         this.businessId = businessId;
         this.categories = categories;
@@ -60,6 +64,7 @@ public class Restaurant {
         this.city = city;
         this.state = state;
         this.stars = stars;
+        this.review_count = review_count;
         this.fullAddress = fullAddress;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -73,6 +78,7 @@ public class Restaurant {
             obj.put("business_id", businessId);
             obj.put("name", name);
             obj.put("stars", stars);
+            obj.put("review_count", review_count);
             obj.put("latitude", latitude);
             obj.put("longitude", longitude);
             obj.put("full_address", fullAddress);
@@ -183,5 +189,8 @@ public class Restaurant {
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	public Integer getReviewCount(){
+		return this.review_count;
 	}
 }

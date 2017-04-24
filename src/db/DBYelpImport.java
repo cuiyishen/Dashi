@@ -35,6 +35,9 @@ public class DBYelpImport {
             String sql = "DROP TABLE IF EXISTS history";
             stmt.executeUpdate(sql);
             
+            sql = "DROP TABLE IF EXISTS comments";
+            stmt.executeUpdate(sql);
+            
             sql = "DROP TABLE IF EXISTS restaurants";
             stmt.executeUpdate(sql);
 
@@ -45,6 +48,7 @@ public class DBYelpImport {
                     + "(business_id VARCHAR(255) NOT NULL, "
                     + " name VARCHAR(255), " + "categories VARCHAR(255), "
                     + "city VARCHAR(255), " + "state VARCHAR(255), "
+                    + "review_count INT,"
                     + "stars FLOAT," + "full_address VARCHAR(255), "
                     + "latitude FLOAT, " + " longitude FLOAT, "
                     + "image_url VARCHAR(255),"
@@ -57,6 +61,17 @@ public class DBYelpImport {
                     + " password VARCHAR(255) NOT NULL, "
                     + " first_name VARCHAR(255), last_name VARCHAR(255), "
                     + " PRIMARY KEY ( user_id ))";
+            stmt.executeUpdate(sql);
+            
+            sql = "CREATE TABLE comments "
+            		+ "(comment_id bigint(20) unsigned NOT NULL AUTO_INCREMENT, "
+                    + " business_id VARCHAR(255) NOT NULL, "
+                    + " user_id VARCHAR(255) NOT NULL, "
+                    + " user VARCHAR(255),"
+                    + " comment VARCHAR(255) NOT NULL, "
+                    + " PRIMARY KEY ( comment_id ),"
+            		+ "FOREIGN KEY (business_id) REFERENCES restaurants(business_id),"
+            		+ "FOREIGN KEY (user_id) REFERENCES users(user_id))";
             stmt.executeUpdate(sql);
             
             sql = "CREATE TABLE history "

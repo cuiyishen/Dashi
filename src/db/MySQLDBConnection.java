@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import com.mysql.jdbc.Statement;
 
+import model.Comment;
 import model.Restaurant;
 import yelp.YelpAPI;
 
@@ -111,6 +112,7 @@ public class MySQLDBConnection implements DBConnection {
                         rs.getString("business_id"), rs.getString("name"),
                         rs.getString("categories"), rs.getString("city"),
                         rs.getString("state"), rs.getFloat("stars"),
+                        rs.getInt("review_count"),
                         rs.getString("full_address"), rs.getFloat("latitude"),
                         rs.getFloat("longitude"), rs.getString("image_url"),
                         rs.getString("url"));
@@ -238,6 +240,7 @@ public class MySQLDBConnection implements DBConnection {
                 String city = restaurant.getCity();
                 String state = restaurant.getState();
                 String fullAddress = restaurant.getFullAddress();
+                Integer reviewCount = restaurant.getReviewCount();
                 double stars = restaurant.getStars();
                 double latitude = restaurant.getLatitude();
                 double longitude = restaurant.getLongitude();
@@ -249,19 +252,20 @@ public class MySQLDBConnection implements DBConnection {
                 //} else {
                 //    obj.put("is_visited", false);
                 //}
-                String sql = "INSERT IGNORE INTO restaurants VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+                String sql = "INSERT IGNORE INTO restaurants VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
                 PreparedStatement statement = conn.prepareStatement(sql);
                 statement.setString(1, businessId);
                 statement.setString(2, name);
                 statement.setString(3, categories);
                 statement.setString(4, city);
                 statement.setString(5, state);
-                statement.setDouble(6, stars);
-                statement.setString(7, fullAddress);
-                statement.setDouble(8, latitude);
-                statement.setDouble(9, longitude);
-                statement.setString(10, imageUrl);
-                statement.setString(11, url);
+                statement.setInt(6, reviewCount);
+                statement.setDouble(7, stars);
+                statement.setString(8, fullAddress);
+                statement.setDouble(9, latitude);
+                statement.setDouble(10, longitude);
+                statement.setString(11, imageUrl);
+                statement.setString(12, url);
                 statement.execute();
                 // Perform filtering if term is specified.
                 if (term == null || term.isEmpty()) {
@@ -336,5 +340,40 @@ public class MySQLDBConnection implements DBConnection {
         }
 	}
 	
+	public void setComments(String userId, String businessId, String userFullName, String comment) {
+        String query = "INSERT INTO comments (user_id, business_id, user, comment) VALUES (?, ?,?,?)";
+        try {
+            PreparedStatement statement = conn.prepareStatement(query);
+            statement.setString(1,  userId);
+            statement.setString(2, businessId);
+            statement.setString(3, userFullName);
+            statement.setString(4, '"'+comment+'"');
+            statement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public JSONArray getComments(String businessId) {
+		try{
+			String sql = "SELECT * from comments WHERE business_id = ?";
+			PreparedStatement statement = conn.prepareStatement(sql);
+			statement.setString(1, businessId);
+			ResultSet rs = statement.executeQuery();
+			JSONArray array = new JSONArray();
+			while(rs.next()){
+				JSONObject obj=new JSONObject();
+				obj.put("business_id", rs.getString("business_id"));
+				obj.put("user_id", rs.getString("user_id"));
+				obj.put("user", rs.getString("user"));
+				obj.put("comment", rs.getString("comment"));
+				array.put(obj);
+			}
+			return array;
+		} catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		return new JSONArray();
+	}
 
 }

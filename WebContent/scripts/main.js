@@ -494,6 +494,133 @@ function changeFavoriteRestaurant(business_id) {
   );
 }
 
+function getSampleReview(review, business_id){
+	  // The request parameters
+	  var url = './comment';
+	  var params = 'business_id=' + business_id;
+	  var req = JSON.stringify({});
+	  // make AJAX call
+	  ajax('GET', url + '?' + params, req,
+	    // successful callback
+	    function (res) {
+	      var comments = JSON.parse(res);
+	      if (!comments || comments.length === 0) {
+	    	  review.innerHTML = 'Be the first one to share your comment?';
+	      } else {
+	    	  review.innerHTML = TruncReview(comments[0].comment);
+	      }
+	    },
+	    // failed callback
+	    function () {
+	      showErrorMessage('Cannot load comments.');
+	    } 
+	  );
+}
+
+function addAllReview(layout3, lessReview, business_id){
+	  var url = './comment';
+	  var params = 'business_id=' + business_id;
+	  var req = JSON.stringify({});
+	  // make AJAX call
+	  ajax('GET', url + '?' + params, req,
+	    // successful callback
+	    function (res) {
+	      var comments = JSON.parse(res);
+	      layout3.innerHTML='';
+	      if (!comments || comments.length === 0) {
+    		  var item = $('li', {className: 'comment'});
+	    	  var list = $('ul', {className: 'commentList'});
+	    	  var sigComment = $('p', {className: 'commentBody'});
+	    	  sigComment.innerHTML = 'No reviews available yet! Be the first one to share your comment?';
+	    	  item.appendChild(sigComment);
+	    	  list.appendChild(item);
+	    	  layout3.appendChild(list);
+	      } else {
+	    	  var list = $('ul', {className: 'commentList'});
+	    	  for (var i = 0; i < comments.length; i++) {
+	    		  if(i>10){
+	    			  break;
+	    		  }
+	    		  var item = $('li', {className: 'comment'});
+	    		  var user = $('p', {className: 'commentUser'});
+	    		  user.innerHTML = 'From ' + comments[i].user +':';
+	    		  var sigComment = $('p', {className: 'commentBody'});
+	    		  sigComment.innerHTML = comments[i].comment;
+	    		  item.appendChild(user);
+	    		  item.appendChild(sigComment);
+	    		  list.appendChild(item);
+	    	  }
+	    	  layout3.appendChild(list);
+	      }
+	      layout3.appendChild(lessReview);
+	    },
+	    // failed callback
+	    function () {
+	      showErrorMessage('Cannot load comments.');
+	    } 
+	  );
+}
+function TruncReview(review){
+	var revLen = review.length;
+	if(revLen<87){
+		return review;
+	}else{
+		list = review.split(" ");
+		wordCount = list.length;
+		var index = wordCount-1;
+		while(revLen>82){
+			revLen=revLen-list[index].length;
+			index--;
+		}
+		return list.slice(0,index+1).join(' ')+'..."';
+	}
+}
+
+function leaveComments(business_id, layout4){
+	if(layout4.style.display==='block'){
+		hideElement(layout4);
+	}else{
+		showElement(layout4);
+	}
+}
+
+function submitComment(business_id,user_id,count){
+	  clearCommentError(count);
+	  //The request parameters
+	  var url = './comment';
+	  var toSubmit = $('newComment' + '-' + count).value;
+	  if(toSubmit===''){
+		  showCommentError(count);
+	  }else{
+		  var req = JSON.stringify({business_id: business_id, user_id: user_id, user: user_fullname, comment:toSubmit});
+		  ajax('POST', url , req,
+				  // successful callback
+			function (res) {
+			  var result = JSON.parse(res);
+			  // successfully logged in
+			  if (result.status === 'OK') {
+				  showCommentResult(count);
+			  }
+		  	},
+		  	// error
+		  	function () {
+		  		showCommentError(count);
+		  	}
+		  );
+	  }
+}
+
+function showCommentError(count) {
+    $('comment-msg' + '-' + count).innerHTML = 'Submission Error, please try again!';
+}
+
+function showCommentResult(count) {
+    $('comment-msg' + '-' + count).innerHTML = 'Successful submission!';
+}
+
+function clearCommentError(count) {
+    $('comment-msg' + '-' + count).innerHTML = '';
+}
 // -------------------------------------
 //  Create restaurant list
 // -------------------------------------
@@ -504,14 +631,14 @@ function changeFavoriteRestaurant(business_id) {
  * @param restaurants - An array of restaurant JSON objects
  */
 function listRestaurants(restaurants) {
-  // Clear the current results
-  var restaurantList = $('restaurant-list');
-  restaurantList.innerHTML = '';
+	  // Clear the current results
+	  var restaurantList = $('restaurant-list');
+	  restaurantList.innerHTML = '';
 
-  for (var i = 0; i < restaurants.length; i++) {
-    addRestaurant(restaurantList, restaurants[i]);
-  }
-}
+	  for (var i = 0; i < restaurants.length; i++) {
+	    addRestaurant(restaurantList, restaurants[i],i);
+	  }
+	}
 
 /**
  * Add restaurant to the list
@@ -519,7 +646,7 @@ function listRestaurants(restaurants) {
  * @param restaurantList - The <ul id="restaurant-list"> tag
  * @param restaurant - The restaurant data (JSON object)
  */
-function addRestaurant(restaurantList, restaurant) {
+function addRestaurant(restaurantList, restaurant,count) {
   var business_id = restaurant.business_id;
   
   // create the <li> tag and specify the id and class attributes
@@ -531,9 +658,9 @@ function addRestaurant(restaurantList, restaurant) {
   // set the data attribute
   li.dataset.business = business_id;
   li.dataset.visited = restaurant.is_visited;
-
+  var layout = $('div', {className: 'horiz-layout'});
   // restaurant image
-  li.appendChild($('img', {src: restaurant.image_url}));
+  layout.appendChild($('img', {src: restaurant.image_url}));
 
   // section
   var section = $('div', {});
@@ -560,15 +687,19 @@ function addRestaurant(restaurantList, restaurant) {
   }
 
   section.appendChild(stars);
+  
+  // comment counts
+  var counts = $('p', {className: 'review-count'});
+  counts.innerHTML = restaurant.review_count + ' Yelp reviews';
+  section.appendChild(counts);
 
-  li.appendChild(section);
+  layout.appendChild(section);
 
   // address
   var address = $('p', {className: 'restaurant-address'});
   
   address.innerHTML = restaurant.full_address.replace(/,/g, '<br/>');
-  li.appendChild(address);
-
+  layout.appendChild(address);
   // favorite link
   var favLink = $('p', {className: 'fav-link'});
   
@@ -581,8 +712,72 @@ function addRestaurant(restaurantList, restaurant) {
     className: restaurant.is_visited ? 'fa fa-heart' : 'fa fa-heart-o'
   }));
   
-  li.appendChild(favLink);
-
+  layout.appendChild(favLink);
+  
+  //sample comment section
+  var layout2 = $('div',{className: 'horiz-layout2', id:'layout2'+'-'+ count});
+  //sample review
+  var  review = $('p', {className: 'review'});
+  getSampleReview(review,business_id);
+  layout2.appendChild(review);
+  //loadmore comments
+  var moreReview = $('a', {className: 'loadMore'});
+  moreReview.innerHTML = 'learn more';
+  layout2.appendChild(moreReview);
+  //all comments section(hide)
+  var layout3 = $('div',{className: 'horiz-layout3', id:'layout3'+'-'+ count});
+  var lessReview = $('a', {className: 'loadLess'});
+  lessReview.innerHTML = 'learn less';
+  addAllReview(layout3, lessReview, business_id);
+  moreReview.onclick = function () {
+	  hideElement(layout2);
+	  addAllReview(layout3, lessReview, business_id);
+	  showElement(layout3);
+  };
+  lessReview.onclick = function () {
+	  hideElement(layout3);
+	  review.innerHTML = '';
+	  getSampleReview(review,business_id);
+	  showElement(layout2,'flex');
+  };
+  
+  // leave comment(hide)
+  var layout4 = $('div',{className: 'horiz-layout4', id:'layout4'+'-'+ count});
+  var leaveComLabel = $('div', {className: 'LeaveComment'});
+  leaveComLabel.innerHTML = 'Leave Your Comment:';
+  layout4.appendChild(leaveComLabel);
+  var CommentInput = $('input', {className: 'newComment', id: 'newComment' + '-' + count});
+  layout4.appendChild(CommentInput);
+  var commentBtn = $('button', {className: 'comment-btn'});
+  commentBtn.innerHTML = 'Submit';
+  commentBtn.onclick = function () {
+	  submitComment(business_id,user_id,count);
+  };
+  layout4.appendChild(commentBtn);
+  var commentMsg = $('button', {className: 'comment-msg', id: 'comment-msg' + '-' + count});
+  layout4.appendChild(commentMsg);
+  
+  //comment link
+  var commentLink = $('p', {className: 'comment-link'});
+  commentLink.onclick = function () {
+	  leaveComments(business_id, layout4);
+  };
+  commentLink.appendChild($('i', {
+	    className: 'fa fa-comments-o'}))
+  layout.appendChild(commentLink);
+  
+  //share link
+  var shareLink = $('p', {className: 'share-link'});
+  shareLink.onclick = function () {
+    //todo
+  };
+  shareLink.appendChild($('i', {
+	    className: 'fa fa-facebook-square'}))
+  layout.appendChild(shareLink);
+  li.appendChild(layout);
+  li.appendChild(layout2); 
+  li.appendChild(layout3);
+  li.appendChild(layout4);
   restaurantList.appendChild(li);
 }
 

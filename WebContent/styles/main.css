@@ -250,7 +250,7 @@ ul {
 #restaurant-list {
   background:  #F2EBD9;
   color:       #624630;
-  display:     none;
+  display: none;
   list-style:  none;
   margin-left: 180px;
   min-height:  250px;
@@ -266,17 +266,23 @@ ul {
 /**
  * restaurant
  */
-.restaurant {
-  align-items:   center;
-  border-bottom: 1px solid #FFFFFF;
-  
-  display:       flex;
+.restaurant{
+  display:       block; 
   margin:        10px;
   padding:       15px;
+  padding-bottom: 30px;
+}
+
+.restaurant :last-child {
+  border: none;
+}
+.horiz-layout{
+  align-items:   center;
+  display:      flex;
   transition:    background-color 100ms linear;
 }
 
-.restaurant:last-child {
+.horiz-layout :last-child {
   border: none;
 }
 
@@ -291,7 +297,7 @@ ul {
   width:  80px;
 }
 
-.restaurant > div:first-of-type {
+.horiz-layout > div:first-of-type {
   flex:         1;
   margin-left:  10px;
   margin-right: 10px;
@@ -323,13 +329,114 @@ ul {
   border-left: 1px solid #FFFFFF;
   cursor:      pointer;
   line-height: 60px;
-  text-align:  center;
-  width:       60px;
+  padding-left: 10px;
+  text-align:  left;
+  width:       30px;
 }
 
 .fav-link:hover {
   color: #F13F3F;
 }
+
+.comment-link {
+  cursor:      pointer;
+  width:       20px;
+}
+
+.comment-link:hover {
+  color: #F13F3F;
+}
+
+.share-link {
+  cursor:      pointer;
+  width:       10px;
+}
+
+.share-link:hover {
+  color: #F13F3F;
+}
+.horiz-layout2{
+  padding-top: 10px;
+  display: flex;
+}
+.review{
+  font-weight: bold;
+  font-style: italic;
+}
+
+.horiz-layout2 > p:first-of-type {
+  flex:         1;
+  margin-left:  10px;
+  margin-right: 10px;
+}
+
+.loadMore {
+  cursor:      pointer;
+  line-height:   20px;
+  text-align:    right;
+  font-style: italic;
+  font-size:  14px;
+  color:           #624630;
+}
+.loadMore:hover {
+  text-decoration: underline;
+}
+.horiz-layout3{
+  display: none;
+  padding-left: 10px;
+  padding-top: 1px;
+  color:       #624630;
+  list-style:  none;
+}
+.comment{
+  margin-top:   10px;
+}
+.commentUser{
+  font-style: italic;
+  text-decoration: underline;
+  font-weight:     400;
+  font-size: 12px;
+}
+.commentBody{
+  font-style: italic;
+  font-size: 12px;
+}
+.loadLess {
+	cursor:      pointer;
+  text-align:    right;
+  font-style: italic;
+  font-size:  11px;
+  color:           #624630;
+}
+.loadLess:hover {
+  text-decoration: underline;
+}
+.horiz-layout4{
+  display: none;
+  padding-top: 1px;
+  color:       #624630;
+  list-style:  none;
+}
+
+.newComment{
+  height:  50px;
+  width: 100%;
+}
+
+.comment-btn{
+  cursor: pointer;
+  float: right;
+  text-align: right;
+  height: 100%;
+  color:           #624630;
+  margin-top: 5px;
+  padding: 2px;
+}
+.comment-msg {
+  color: #990000;
+  padding-top: 10px;
+}
+
 
 /**
  * footer section
@@ -359,4 +466,3 @@ footer ul {
 footer ul li {
   flex: 1;
 }
-

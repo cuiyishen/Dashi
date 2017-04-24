@@ -19,6 +19,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 
+import model.Comment;
 import model.Restaurant;
 import yelp.YelpAPI;
 
@@ -254,4 +255,16 @@ public class MongoDBConnection implements DBConnection {
     public void setUser(String userId, String password, String firstName, String lastName){
     //todo
     }
+
+	@Override
+	public JSONArray getComments(String businessId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setComments(String userId, String businessId, String userFullName, String comment) {
+		// TODO Auto-generated method stub
+		
+	}
 }

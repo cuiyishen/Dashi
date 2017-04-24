@@ -41,7 +41,7 @@ public class RestaurantTest {
        public void setUp() {
         restaurant = new Restaurant("yam-leaf-bistro-mountain-view", "Yam Leaf Bistro",
                 "Vegetarian,vegetarian,Vegan,vegan,Gluten-Free,gluten_free",
-                "Mountain View", "CA", 4.5, "699 Calderon Ave,Mountain View, CA 94041",
+                "Mountain View", "CA", 4.5, 25, "699 Calderon Ave,Mountain View, CA 94041",
                 37.3851249, -122.075775,
                 "http://s3-media1.fl.yelpcdn.com/bphoto/6NchHRhvHpVj4DXs2WQATw/ms.jpg",
                 "http://www.yelp.com/biz/yam-leaf-bistro-mountain-view");

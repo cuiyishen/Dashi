@@ -98,7 +98,6 @@ public class visitHistory extends HttpServlet {
             return;
         }
         try {
-                                            DBConnection connection = new MySQLDBConnection();
             JSONArray array = null;
             // allow access only if session exists
                                            /*
